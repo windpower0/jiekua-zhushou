@@ -56,18 +56,15 @@ class SetupActivity : AppCompatActivity() {
         btnSetup.isEnabled = false
         tvStatus.text = "正在请求短信权限…"
         XXPermissions.with(this)
-            .permission(Permission.RECEIVE_SMS)
+            .permission(PermissionLists.getReceiveSmsPermission())
             .request(object : OnPermissionCallback {
                 override fun onResult(granted: MutableList<IPermission>, denied: MutableList<IPermission>) {
-                    // 仅短信读取权限为必需；卡槽号读取/通知等权限可选，被拒不影响配置
-                    if (!XXPermissions.isGranted(this@SetupActivity, Permission.RECEIVE_SMS)) {
+                    // 仅短信读取权限为必需；其余权限可选，被拒不影响配置
+                    if (denied.isNotEmpty()) {
                         progress.visibility = View.GONE
                         btnSetup.isEnabled = true
                         tvStatus.text = "需要短信读取权限才能转发验证码，请在系统设置中授予后重试"
                         return
-                    }
-                    if (denied.isNotEmpty()) {
-                        tvStatus.text = "部分可选权限未授予，将仅以卡槽标识（SIM1/SIM2）命名通道"
                     }
                     buildConfig(token)
                 }
