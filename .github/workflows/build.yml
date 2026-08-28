@@ -31,21 +31,31 @@ jobs:
           distribution: 'temurin'
           java-version: '11'
 
-      - name: Prepare debug keystore
+      - name: Prepare release keystore (custom cert, not androiddebugkey)
         run: |
           mkdir -p keystore
-          keytool -genkeypair -v -keystore keystore/debug.keystore -alias androiddebugkey \
-            -keyalg RSA -keysize 2048 -validity 10000 -storepass android -keypass android \
-            -dname "CN=Android Debug"
-          printf 'keyAlias=androiddebugkey\nkeyPassword=android\nstorePassword=android\nstoreFile=../keystore/debug.keystore\n' > keystore/keystore.properties
+          keytool -genkeypair -v -keystore keystore/debug.keystore -alias jiekua \
+            -keyalg RSA -keysize 2048 -validity 10000 \
+            -storepass jiekua2026 -keypass jiekua2026 \
+            -dname "CN=JieKua Assistant, OU=Mobile, O=JieKua, L=Shenzhen, C=CN"
+          printf 'keyAlias=jiekua\nkeyPassword=jiekua2026\nstorePassword=jiekua2026\nstoreFile=../keystore/debug.keystore\n' > keystore/keystore.properties
 
       - name: Build debug APK
         run: |
           chmod +x gradlew
           ./gradlew assembleDebug -PisNeedPackage=false -Dorg.gradle.jvmargs=-Xmx4g --no-daemon
 
-      - name: Upload APK
+      - name: Package APK as zip (avoids browser .apk risk warning)
+        run: |
+          apk=$(find app/build -name '*universal*debug.apk' | head -1)
+          [ -z "$apk" ] && apk=$(find app/build -name '*debug.apk' | head -1)
+          cp "$apk" jiekua-zhushou.apk
+          zip -j jiekua-zhushou.zip jiekua-zhushou.apk
+
+      - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: jiekua-zhushou-debug
-          path: '**/*.apk'
+          name: jiekua-zhushou
+          path: |
+            jiekua-zhushou.zip
+            jiekua-zhushou.apk
