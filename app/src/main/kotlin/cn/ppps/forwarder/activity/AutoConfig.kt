@@ -12,7 +12,7 @@ import java.util.Date
 
 /**
  * 接码助手（二开）：根据平台 Token 与卡槽列表，程序化创建 Webhook 发送通道 + 转发规则。
- * 模板固定为：{"mark":"SIMx","phone":"<真实号>","sender":"[from]","content":"[content]"}
+ * 模板固定为：{"mark":"SIMx","phone":"<真实号>","sender":"{{FROM}}","content":"{{MSG}}"}
  */
 object AutoConfig {
 
@@ -22,8 +22,8 @@ object AutoConfig {
             val body = LinkedHashMap<String, String>()
             body["mark"] = label
             if (number.isNotBlank()) body["phone"] = number
-            body["sender"] = "[from]"
-            body["content"] = "[content]"
+            body["sender"] = "{{FROM}}"
+            body["content"] = "{{MSG}}"
             val setting = WebhookSetting(
                 method = "POST",
                 webServer = JK_SERVER_URL,
