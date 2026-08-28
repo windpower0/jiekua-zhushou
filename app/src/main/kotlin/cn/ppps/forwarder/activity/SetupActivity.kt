@@ -16,9 +16,9 @@ import cn.ppps.forwarder.R
 import cn.ppps.forwarder.service.ForegroundService
 import cn.ppps.forwarder.utils.ACTION_START
 import cn.ppps.forwarder.utils.SettingUtils
-import com.hjq.permissions.IPermission
 import com.hjq.permissions.OnPermissionCallback
-import com.hjq.permissions.Permission
+import com.hjq.permissions.permission.PermissionLists
+import com.hjq.permissions.permission.base.IPermission
 import com.hjq.permissions.XXPermissions
 import com.xuexiang.xutil.app.ActivityUtils
 import kotlinx.coroutines.Dispatchers
@@ -55,10 +55,10 @@ class SetupActivity : AppCompatActivity() {
         btnSetup.isEnabled = false
         tvStatus.text = "正在请求权限…"
         XXPermissions.with(this)
-            .permission(Permission.RECEIVE_SMS)
-            .permission(Permission.READ_PHONE_STATE)
-            .permission(Permission.READ_PHONE_NUMBERS)
-            .permission(Permission.POST_NOTIFICATIONS)
+            .permission(PermissionLists.getReceiveSmsPermission())
+            .permission(PermissionLists.getReadPhoneStatePermission())
+            .permission(PermissionLists.getReadPhoneNumbersPermission())
+            .permission(PermissionLists.getPostNotificationsPermission())
             .request(object : OnPermissionCallback {
                 override fun onResult(granted: MutableList<IPermission>, denied: MutableList<IPermission>) {
                     if (denied.isNotEmpty()) {
