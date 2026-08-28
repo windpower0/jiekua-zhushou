@@ -29,6 +29,30 @@
         android:inputType="text"
         android:layout_marginTop="32dp" />
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="填写本机号码（用于平台识别运营商/省份）"
+        android:textSize="13sp"
+        android:textColor="#888888"
+        android:layout_marginTop="24dp" />
+
+    <EditText
+        android:id="@+id/etSim1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="卡槽1 本机号码，如 13800001111"
+        android:inputType="phone"
+        android:layout_marginTop="8dp" />
+
+    <EditText
+        android:id="@+id/etSim2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="卡槽2 号码（双卡选填，单卡留空）"
+        android:inputType="phone"
+        android:layout_marginTop="8dp" />
+
     <Button
         android:id="@+id/btnSetup"
         android:layout_width="match_parent"

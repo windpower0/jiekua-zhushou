@@ -1,10 +1,8 @@
 package cn.ppps.forwarder.activity
 
-import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.telephony.SubscriptionManager
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
@@ -26,11 +24,14 @@ import kotlinx.coroutines.launch
 
 /**
  * 接码助手（二开）：首次启动的一键配置页。
- * 仅要求填入平台 Token，自动读取卡槽手机号并建好 Webhook 通道与转发规则。
+ * 仅要求填入平台 Token 与本机号码（无法自动读取时手动填），自动建好 Webhook 通道与转发规则。
+ * 只申请短信读取权限，不申请 READ_PHONE_STATE，因此号码需用户手动填写。
  */
 class SetupActivity : AppCompatActivity() {
 
     private lateinit var etToken: EditText
+    private lateinit var etSim1: EditText
+    private lateinit var etSim2: EditText
     private lateinit var btnSetup: Button
     private lateinit var progress: ProgressBar
     private lateinit var tvStatus: TextView
@@ -39,6 +40,8 @@ class SetupActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_setup)
         etToken = findViewById(R.id.etToken)
+        etSim1 = findViewById(R.id.etSim1)
+        etSim2 = findViewById(R.id.etSim2)
         btnSetup = findViewById(R.id.btnSetup)
         progress = findViewById(R.id.progress)
         tvStatus = findViewById(R.id.tvStatus)
@@ -50,6 +53,11 @@ class SetupActivity : AppCompatActivity() {
         val token = etToken.text.toString().trim()
         if (token.isEmpty()) {
             tvStatus.text = "请先填写接码平台 Token"
+            return
+        }
+        val sim1 = etSim1.text.toString().trim()
+        if (sim1.isEmpty()) {
+            tvStatus.text = "请填写卡槽1 本机号码"
             return
         }
         progress.visibility = View.VISIBLE
@@ -66,15 +74,16 @@ class SetupActivity : AppCompatActivity() {
                         tvStatus.text = "需要短信读取权限才能转发验证码，请在系统设置中授予后重试"
                         return
                     }
-                    buildConfig(token)
+                    buildConfig(token, sim1, etSim2.text.toString().trim())
                 }
             })
     }
 
-    private fun buildConfig(token: String) {
+    private fun buildConfig(token: String, sim1: String, sim2: String) {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
-                val sims = readSims(this@SetupActivity)
+                val sims = mutableListOf("SIM1" to sim1)
+                if (sim2.isNotEmpty()) sims.add("SIM2" to sim2)
                 AutoConfig.configure(token, sims)
                 SettingUtils.jkToken = token
                 SettingUtils.jkConfigured = true
@@ -102,32 +111,6 @@ class SetupActivity : AppCompatActivity() {
             startForegroundService(intent)
         } else {
             startService(intent)
-        }
-    }
-
-    private fun readSims(ctx: Context): List<Pair<String, String>> {
-        return try {
-            val sm = ctx.getSystemService(Context.TELEPHONY_SUBSCRIPTION_SERVICE) as SubscriptionManager
-            val list = sm.activeSubscriptionInfoList ?: emptyList()
-            if (list.isEmpty()) {
-                listOf("SIM1" to "")
-            } else {
-                list.mapIndexed { index, sub ->
-                    val label = "SIM${index + 1}"
-                    val number = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                        try {
-                            sm.getPhoneNumber(sub.subscriptionId)
-                        } catch (_: Exception) {
-                            ""
-                        }
-                    } else {
-                        sub.number ?: ""
-                    }
-                    label to number
-                }
-            }
-        } catch (_: Exception) {
-            listOf("SIM1" to "")
         }
     }
 }
