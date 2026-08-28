@@ -37,7 +37,7 @@ jobs:
           keytool -genkeypair -v -keystore keystore/debug.keystore -alias androiddebugkey \
             -keyalg RSA -keysize 2048 -validity 10000 -storepass android -keypass android \
             -dname "CN=Android Debug"
-          printf 'keyAlias=androiddebugkey\nkeyPassword=android\nstorePassword=android\nstoreFile=keystore/debug.keystore\n' > keystore/keystore.properties
+          printf 'keyAlias=androiddebugkey\nkeyPassword=android\nstorePassword=android\nstoreFile=../keystore/debug.keystore\n' > keystore/keystore.properties
 
       - name: Build debug APK
         run: |

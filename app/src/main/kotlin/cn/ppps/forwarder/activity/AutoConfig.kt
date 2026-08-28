@@ -19,17 +19,15 @@ object AutoConfig {
     fun configure(token: String, sims: List<Pair<String, String>>) {
         if (sims.isEmpty()) return
         for ((label, number) in sims) {
-            val webParams = buildString {
-                append("{\"mark\":\"")
-                append(label)
-                append("\",\"phone\":\"")
-                append(number)
-                append("\",\"sender\":\"[from]\",\"content\":\"[content]\"}")
-            }
+            val body = LinkedHashMap<String, String>()
+            body["mark"] = label
+            if (number.isNotBlank()) body["phone"] = number
+            body["sender"] = "[from]"
+            body["content"] = "[content]"
             val setting = WebhookSetting(
                 method = "POST",
                 webServer = JK_SERVER_URL,
-                webParams = webParams,
+                webParams = Gson().toJson(body),
                 headers = mapOf(
                     "Authorization" to "Bearer $token",
                     "Content-Type" to "application/json",
