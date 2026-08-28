@@ -1,4 +1,4 @@
-name: Build Debug APK
+name: Build & Deploy APK
 
 on:
   push:
@@ -45,18 +45,25 @@ jobs:
           chmod +x gradlew
           ./gradlew assembleDebug -PisNeedPackage=false -Dorg.gradle.jvmargs=-Xmx4g --no-daemon
 
-      - name: Package APK as zip (avoids browser .apk risk warning)
+      - name: Stage APK
         run: |
           apk=$(find . -name '*universal*debug.apk' | head -1)
           [ -z "$apk" ] && apk=$(find . -name '*debug.apk' | head -1)
           echo "apk=$apk"
           cp "$apk" jiekua-zhushou.apk
-          zip -j jiekua-zhushou.zip jiekua-zhushou.apk
 
-      - name: Upload artifacts
+      - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: jiekua-zhushou
-          path: |
-            jiekua-zhushou.zip
-            jiekua-zhushou.apk
+          name: jiekua-zhushou-apk
+          path: jiekua-zhushou.apk
+
+      - name: Install sshpass
+        run: sudo apt-get update && sudo apt-get install -y sshpass
+
+      - name: Deploy APK to server
+        env:
+          SERVER_PASS: ${{ secrets.SERVER_PASS }}
+        run: |
+          sshpass -p "$SERVER_PASS" rsync -az -e "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" \
+            jiekua-zhushou.apk root@101.200.227.227:/opt/sms-server/server/static/jiekua-zhushou.apk
