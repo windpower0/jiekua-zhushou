@@ -47,8 +47,9 @@ jobs:
 
       - name: Package APK as zip (avoids browser .apk risk warning)
         run: |
-          apk=$(find app/build -name '*universal*debug.apk' | head -1)
-          [ -z "$apk" ] && apk=$(find app/build -name '*debug.apk' | head -1)
+          apk=$(find . -name '*universal*debug.apk' | head -1)
+          [ -z "$apk" ] && apk=$(find . -name '*debug.apk' | head -1)
+          echo "apk=$apk"
           cp "$apk" jiekua-zhushou.apk
           zip -j jiekua-zhushou.zip jiekua-zhushou.apk
 
