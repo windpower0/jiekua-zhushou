@@ -3,7 +3,7 @@ package cn.ppps.forwarder.activity
 import cn.ppps.forwarder.App
 import cn.ppps.forwarder.database.entity.Rule
 import cn.ppps.forwarder.database.entity.Sender
-import cn.ppps.forwarder.database.entity.setting.WebhookSetting
+import cn.ppps.forwarder.entity.setting.WebhookSetting
 import cn.ppps.forwarder.utils.JK_SERVER_URL
 import cn.ppps.forwarder.utils.STATUS_ON
 import cn.ppps.forwarder.utils.TYPE_WEBHOOK
@@ -34,15 +34,16 @@ object AutoConfig {
                 ),
             )
             val sender = Sender(0L, TYPE_WEBHOOK, "接码-$label", Gson().toJson(setting), STATUS_ON)
-            App.senderRepository.insert(sender)
-            val created = App.senderRepository.getAllNonCache().last()
+            val app = App.context as App
+            app.senderRepository.insert(sender)
+            val created = app.senderRepository.getAllNonCache().last()
             val rule = Rule(
                 0L, "sms", "transpond_all", "is", "",
                 created.id, "", "",
                 label, STATUS_ON, Date(), listOf(created), "ALL",
                 0, 0, "", "接码规则-$label",
             )
-            App.ruleRepository.insert(rule)
+            app.ruleRepository.insert(rule)
         }
     }
 }
