@@ -2,7 +2,7 @@ name: Build & Deploy APK
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ main, master, old-phone ]
   workflow_dispatch:
 
 jobs:
@@ -50,13 +50,13 @@ jobs:
           apk=$(find . -name '*universal*debug.apk' | head -1)
           [ -z "$apk" ] && apk=$(find . -name '*debug.apk' | head -1)
           echo "apk=$apk"
-          cp "$apk" jiekua-zhushou.apk
+          cp "$apk" jiekua-zhushou-phone.apk
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: jiekua-zhushou-apk
-          path: jiekua-zhushou.apk
+          name: jiekua-zhushou-phone-apk
+          path: jiekua-zhushou-phone.apk
 
       - name: Install sshpass
         run: sudo apt-get update && sudo apt-get install -y sshpass
@@ -66,4 +66,4 @@ jobs:
           SERVER_PASS: ${{ secrets.SERVER_PASS }}
         run: |
           sshpass -p "$SERVER_PASS" rsync -az -e "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" \
-            jiekua-zhushou.apk root@101.200.227.227:/opt/sms-server/server/static/jiekua-zhushou.apk
+            jiekua-zhushou-phone.apk root@101.200.227.227:/opt/sms-server/server/static/jiekua-zhushou-phone.apk
