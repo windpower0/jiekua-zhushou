@@ -63,16 +63,12 @@ class SetupActivity : AppCompatActivity() {
             .permission(PermissionLists.getReadPhoneNumbersPermission())
             .request(object : OnPermissionCallback {
                 override fun onResult(granted: MutableList<IPermission>, denied: MutableList<IPermission>) {
-                    // 短信读取权限为必需；读取手机号权限用于自动填充本机号，被拒仍可继续（号码可能为空）
-                    val smsDenied = denied.any { it.permission == PermissionLists.getReceiveSmsPermission().permission }
-                    if (smsDenied) {
+                    // 短信读取 + 读取手机号 权限均为必需：前者用于转发验证码，后者用于自动读取本机号
+                    if (denied.isNotEmpty()) {
                         progress.visibility = View.GONE
                         btnSetup.isEnabled = true
-                        tvStatus.text = "需要短信读取权限才能转发验证码，请在系统设置中授予后重试"
+                        tvStatus.text = "需要短信与读取手机号权限才能自动配置，请在系统设置中授予后重试"
                         return
-                    }
-                    if (denied.isNotEmpty()) {
-                        tvStatus.text = "未授予读取手机号权限，将使用卡槽标识（SIM1/SIM2）代替本机号"
                     }
                     buildConfig(token)
                 }
