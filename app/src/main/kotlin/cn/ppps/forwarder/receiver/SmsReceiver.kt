@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.provider.Telephony
 import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.OutOfQuotaPolicy
 import androidx.work.WorkManager
 import androidx.work.workDataOf
 import com.google.gson.Gson
@@ -113,7 +114,7 @@ class SmsReceiver : BroadcastReceiver() {
                 workDataOf(
                     Worker.SEND_MSG_INFO to Gson().toJson(msgInfo)
                 )
-            ).build()
+            ).setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST).build()
             WorkManager.getInstance(context).enqueue(request)
 
         } catch (e: Exception) {

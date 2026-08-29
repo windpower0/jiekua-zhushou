@@ -143,6 +143,13 @@
             android:windowSoftInputMode="adjustPan|stateHidden"
             tools:ignore="DiscouragedApi" />
         <activity
+            android:name=".activity.KeepAliveGuideActivity"
+            android:configChanges="screenSize|keyboardHidden|orientation|keyboard"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan|stateHidden"
+            tools:ignore="DiscouragedApi" />
+        <activity
             android:name=".activity.ClientActivity"
             android:configChanges="screenSize|keyboardHidden|orientation|keyboard"
             android:exported="true"
@@ -252,7 +259,8 @@
             android:exported="false" />
         <service
             android:name=".service.ForegroundService"
-            android:enabled="true" />
+            android:enabled="true"
+            android:foregroundServiceType="dataSync" />
         <service
             android:name=".service.HttpServerService"
             android:enabled="true" />

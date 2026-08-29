@@ -113,6 +113,12 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding?>(), View.OnClickL
         titleBar!!.setLeftImageResource(R.drawable.ic_action_menu)
         titleBar!!.setTitle(R.string.menu_settings)
         titleBar!!.setLeftClickListener { getContainer()?.openMenu() }
+        titleBar!!.addAction(object : TitleBar.TextAction("保活") {
+            @SingleClick
+            override fun performAction(view: View) {
+                startActivity(Intent(requireContext(), KeepAliveGuideActivity::class.java))
+            }
+        })
         titleBar!!.addAction(object : TitleBar.ImageAction(R.drawable.ic_restore) {
             @SingleClick
             override fun performAction(view: View) {

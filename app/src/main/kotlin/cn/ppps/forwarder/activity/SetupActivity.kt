@@ -1,8 +1,11 @@
 package cn.ppps.forwarder.activity
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.PowerManager
+import android.provider.Settings
 import android.telephony.SubscriptionInfo
 import android.telephony.SubscriptionManager
 import android.telephony.TelephonyManager
@@ -85,6 +88,7 @@ class SetupActivity : AppCompatActivity() {
                 SettingUtils.enableSms = true
                 startForwardService()
                 runOnUiThread {
+                    requestBatteryOptimization()
                     ActivityUtils.startActivity(MainActivity::class.java)
                     finish()
                 }
@@ -154,6 +158,22 @@ class SetupActivity : AppCompatActivity() {
             startForegroundService(intent)
         } else {
             startService(intent)
+        }
+    }
+
+    /**
+     * 申请电池优化白名单，降低被系统后台清理的概率。
+     */
+    private fun requestBatteryOptimization() {
+        try {
+            val pm = getSystemService(PowerManager::class.java)
+            if (pm != null && !pm.isIgnoringBatteryOptimizations(packageName)) {
+                val i = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS)
+                i.data = Uri.parse("package:$packageName")
+                startActivity(i)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 }
